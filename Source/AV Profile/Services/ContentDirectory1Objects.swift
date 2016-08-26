@@ -197,6 +197,36 @@ extension ContentDirectory1Object {
     }
 }
 
+public class ContentDirectory1AudioItem: ContentDirectory1Item {
+    public let duration: NSTimeInterval?
+    public let protocolInfo: String?
+    
+    override init?(xmlElement: ONOXMLElement) {
+        
+        if let durationString = xmlElement.firstChildWithTag("res")?.valueForAttribute("duration") as? String {
+            let durationComponents = durationString.componentsSeparatedByString(":")
+            var count: Double = 0
+            var duration: Double = 0
+            for durationComponent in durationComponents.reverse() {
+                duration += (durationComponent as NSString).doubleValue * pow(60, count)
+                count++
+            }
+            
+            self.duration = NSTimeInterval(duration)
+        } else { self.duration = nil }
+        
+        protocolInfo = xmlElement.firstChildWithTag("res").valueForAttribute("protocolInfo") as? String
+        
+        super.init(xmlElement: xmlElement)
+    }
+}
+
+extension ContentDirectory1Object {
+    public func isContentDirectory1AudioItem() -> Bool {
+        return self is ContentDirectory1AudioItem
+    }
+}
+
 /// overrides ExtendedPrintable protocol implementation
 extension ContentDirectory1VideoItem {
     override public var className: String { return "\(self.dynamicType)" }
